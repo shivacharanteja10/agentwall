@@ -1,0 +1,87 @@
+{
+  "total_samples": 299,
+  "attack_samples": 79,
+  "benign_samples": 220,
+  "true_positives": 52,
+  "false_positives": 0,
+  "true_negatives": 220,
+  "false_negatives": 27,
+  "precision": 1.0,
+  "recall": 0.6582278481012658,
+  "f1": 0.7938931297709924,
+  "block_rate": 0.17391304347826086,
+  "false_positive_rate": 0.0,
+  "by_category": {
+    "direct_injection": {
+      "tp": 18,
+      "fp": 0,
+      "tn": 0,
+      "fn": 2,
+      "total": 20,
+      "precision": 1.0,
+      "recall": 0.9,
+      "f1": 0.9473684210526316
+    },
+    "indirect_injection": {
+      "tp": 12,
+      "fp": 0,
+      "tn": 0,
+      "fn": 2,
+      "total": 14,
+      "precision": 1.0,
+      "recall": 0.8571428571428571,
+      "f1": 0.923076923076923
+    },
+    "encoding_evasion": {
+      "tp": 11,
+      "fp": 0,
+      "tn": 0,
+      "fn": 14,
+      "total": 25,
+      "precision": 1.0,
+      "recall": 0.44,
+      "f1": 0.6111111111111112
+    },
+    "role_escalation": {
+      "tp": 8,
+      "fp": 0,
+      "tn": 0,
+      "fn": 0,
+      "total": 8,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "tool_smuggling": {
+      "tp": 3,
+      "fp": 0,
+      "tn": 0,
+      "fn": 3,
+      "total": 6,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6666666666666666
+    },
+    "exfiltration": {
+      "tp": 0,
+      "fp": 0,
+      "tn": 0,
+      "fn": 6,
+      "total": 6,
+      "precision": 0,
+      "recall": 0.0,
+      "f1": 0
+    },
+    "benign": {
+      "tp": 0,
+      "fp": 0,
+      "tn": 220,
+      "fn": 0,
+      "total": 220,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    }
+  },
+  "timestamp": "2026-10-25T00:37:47.778270"
+}

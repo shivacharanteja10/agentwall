@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: agentwall-postgres
+    environment:
+      POSTGRES_USER: agentwall
+      POSTGRES_PASSWORD: agentwall
+      POSTGRES_DB: agentwall
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentwall -d agentwall"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: agentwall-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: agentwall-gateway
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://agentwall:agentwall@postgres:5432/agentwall
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - FILESYSTEM_SERVER_URL=http://filesystem:8001
+      - DATABASE_SERVER_URL=http://database:8002
+      - WEB_FETCH_SERVER_URL=http://web_fetch:8003
+      - EGRESS_ALLOWLIST=http://filesystem:8001,http://database:8002,http://web_fetch:8003
+      - LOG_LEVEL=INFO
+      - LOG_FORMAT=json
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      filesystem:
+        condition: service_started
+      database:
+        condition: service_started
+      web_fetch:
+        condition: service_started
+    restart: unless-stopped
+
+  filesystem:
+    build:
+      context: ./tool_servers/filesystem
+      dockerfile: Dockerfile
+    container_name: agentwall-filesystem
+    ports:
+      - "8001:8001"
+    volumes:
+      - filesystem_data:/tmp/agentwall_fs
+    restart: unless-stopped
+
+  database:
+    build:
+      context: ./tool_servers/database
+      dockerfile: Dockerfile
+    container_name: agentwall-database
+    ports:
+      - "8002:8002"
+    restart: unless-stopped
+
+  web_fetch:
+    build:
+      context: ./tool_servers/web_fetch
+      dockerfile: Dockerfile
+    container_name: agentwall-web-fetch
+    ports:
+      - "8003:8003"
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: agentwall-dashboard
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - gateway
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  filesystem_data:
